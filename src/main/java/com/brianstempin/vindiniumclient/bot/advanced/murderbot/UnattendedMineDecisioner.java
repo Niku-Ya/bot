@@ -54,12 +54,25 @@ public class UnattendedMineDecisioner implements Decision<AdvancedMurderBot.Game
             }
         }
 
+    	int ownedCount = 0;
+    	int total = 0;
+    	for (Mine mines : context.getGameState().getMines().values()) {
+    		if (mines.getOwner().getId() == context.getGameState().getMe().getId()) {
+    			ownedCount += 1;
+    		}
+    		total += 1;
+    	}
+    	if (ownedCount >= total/2) {
+    		logger.info("I has monies no care");
+    		return noGoodMineDecision.makeDecision(context);
+    	}
+        
         if(targetMine != null) {
 
             // Is it safe to move?
             if(BotUtils.getHeroesAround(context.getGameState(), context.getDijkstraResultMap(), 2).size() > 0) {
                 for (Hero h : BotUtils.getHeroesAround(context.getGameState(), context.getDijkstraResultMap(), 2)) {
-                	if (h.getLife() > 25) {
+                	if (h.getLife() > 25 || h.getLife() > context.getGameState().getMe().getLife()) {
                     	logger.info("Mine found, but another hero is too close.");
                         return noGoodMineDecision.makeDecision(context);
                 	}
@@ -79,6 +92,7 @@ public class UnattendedMineDecisioner implements Decision<AdvancedMurderBot.Game
             return BotUtils.directionTowards(context.getGameState().getMe().getPos(),
                     currentPosition);
         } else {
+
             logger.info("No suitable mine found.  Deferring.");
             return noGoodMineDecision.makeDecision(context);
         }

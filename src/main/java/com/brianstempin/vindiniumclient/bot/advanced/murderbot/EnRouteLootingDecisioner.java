@@ -11,6 +11,7 @@ import com.brianstempin.vindiniumclient.dto.GameState.Hero;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,10 +41,18 @@ public class EnRouteLootingDecisioner implements Decision<AdvancedMurderBot.Game
             Mine mine = context.getGameState().getMines().get(currentVertex.getPosition());
             if(mine != null && (mine.getOwner() == null
                     || mine.getOwner().getId() != context.getGameState().getMe().getId())) {
-
+            	
+            	boolean willIdie = false;
+            	List<GameState.Hero> enemies = BotUtils.getHeroesAround(context.getGameState(), context.getDijkstraResultMap(), 1);
+            	for (Hero e : enemies) {
+            		if ( e.getLife() > context.getGameState().getMe().getLife()) {
+            			willIdie = true;
+            			break;
+            	}
+            	}
+            	
                 // Is it safe to take?
-                if(BotUtils.getHeroesAround(context.getGameState(), context.getDijkstraResultMap(), 1).size() > 0 &&
-                		context.getGameState().getMe().getLife() < 40) {
+                if(BotUtils.getHeroesAround(context.getGameState(), context.getDijkstraResultMap(), 1).size() > 0 && willIdie) {
 /*                    for (Hero h : BotUtils.getHeroesAround(context.getGameState(), context.getDijkstraResultMap(), 1)) {
                     	if (h.getLife() > 25 && h.getId() != context.getGameState().getMe().getId()) {
  */                       	logger.info("Mine found, but another hero is too close.");

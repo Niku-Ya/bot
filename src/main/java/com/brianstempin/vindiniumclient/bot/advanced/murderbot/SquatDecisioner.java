@@ -4,9 +4,13 @@ import com.brianstempin.vindiniumclient.bot.BotMove;
 import com.brianstempin.vindiniumclient.bot.BotUtils;
 import com.brianstempin.vindiniumclient.bot.advanced.Pub;
 import com.brianstempin.vindiniumclient.dto.GameState;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,9 +46,21 @@ public class SquatDecisioner implements Decision<AdvancedMurderBot.GameContext, 
                 nearestPubDijkstraResult = dijkstraResultMap.get(pub.getPosition());
             }
         }
+        
+        List<GameState.Hero> heroes = new ArrayList(context.getGameState().getHeroesById().values());
+        List<Integer> coins = new ArrayList<>();
+        List<Integer> mineLord = new ArrayList<>();
+        for (GameState.Hero h : heroes) {
+        	if (h.getId() != context.getGameState().getMe().getId()) {
+        		coins.add(h.getGold());
+        		mineLord.add(h.getMineCount());
+        	}
+        }
 
         // Do we need to move to get there?
-        if(null == nearestPubDijkstraResult) {
+        if((null == nearestPubDijkstraResult 
+        		&& me.getGold() > Collections.max(coins))
+        		|| (null == nearestPubDijkstraResult && me.getMineCount() > Collections.max(mineLord))) {
             return BotMove.STAY;
         } else if(nearestPubDijkstraResult.getDistance() > 1) {
             AdvancedMurderBot.DijkstraResult currentResult = nearestPubDijkstraResult;
@@ -60,13 +76,18 @@ public class SquatDecisioner implements Decision<AdvancedMurderBot.GameContext, 
         }
 
         // Ok, we must be there.  Do we need health?
-        if(me.getLife() < 50) {
-            logger.info("Getting health while squatting.");
+        if(me.getLife() < 30) {
+            logger.info("Getting tired need drank.");
             return BotUtils.directionTowards(me.getPos(), nearestPub.getPosition());
+        }
+        
+        if(me.getLife() < 50 && BotUtils.getHeroesAround(context.getGameState(), context.getDijkstraResultMap(), 2).size() > 0) {
+        	logger.info("Enemies apporach! Shields must charge!");
+        	return BotUtils.directionTowards(me.getPos(), nearestPub.getPosition());
         }
 
         // Nothing to do...squat!
-        logger.info("Squatting at pub.");
+        logger.info("BarCrafts stuf");
         return BotMove.STAY;
     }
 }
