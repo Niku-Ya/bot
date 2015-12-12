@@ -40,13 +40,13 @@ public class CombatEngagementDecisioner implements Decision<AdvancedMurderBot.Ga
             // Is there a neighbor in this vertex
             GameState.Position neighboringPosition = neighboringVertex.getPosition();
             if(heroesByPosition.containsKey(neighboringPosition)) {
-                logger.info("Bot is currently engaged in combat.");
+                logger.info("Bot longs for combat! En taro Adun!");
                 return yesDecision.makeDecision(context);
             }
         }
 
         // Welp, no one was close, so its false.
-        logger.info("Bot is currently not engaged in combat.");
+        logger.info("Bot is currently not engaged in combat. Orders Executor?");
         return noDecision.makeDecision(context);
     }
 }

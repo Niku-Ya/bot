@@ -4,6 +4,8 @@ import com.brianstempin.vindiniumclient.bot.BotMove;
 import com.brianstempin.vindiniumclient.bot.BotUtils;
 import com.brianstempin.vindiniumclient.bot.advanced.Mine;
 import com.brianstempin.vindiniumclient.dto.GameState;
+import com.brianstempin.vindiniumclient.dto.GameState.Hero;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,8 +58,14 @@ public class UnattendedMineDecisioner implements Decision<AdvancedMurderBot.Game
 
             // Is it safe to move?
             if(BotUtils.getHeroesAround(context.getGameState(), context.getDijkstraResultMap(), 2).size() > 0) {
-                logger.info("Mine found, but another hero is too close.");
-                return noGoodMineDecision.makeDecision(context);
+                for (Hero h : BotUtils.getHeroesAround(context.getGameState(), context.getDijkstraResultMap(), 2)) {
+                	if (h.getLife() > 25) {
+                    	logger.info("Mine found, but another hero is too close.");
+                        return noGoodMineDecision.makeDecision(context);
+                	}
+                	continue;
+                }
+
             }
 
             GameState.Position currentPosition = targetMine.getPosition();

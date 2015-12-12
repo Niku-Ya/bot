@@ -35,8 +35,8 @@ public class BotTargetingDecisioner implements Decision<AdvancedMurderBot.GameCo
 
         // Are there a crashed bot with mines we can take advantage of?
         for(Mine currentMine : context.getGameState().getMines().values()) {
-            if(currentMine.getOwner() != null && currentMine.getOwner().isCrashed()) {
-
+            if(currentMine.getOwner() != null && currentMine.getOwner().isCrashed() && me.getLife() >= 35) {
+            	
                 GameState.Hero target = currentMine.getOwner();
                 AdvancedMurderBot.DijkstraResult currentDijkstraResult =
                         context.getDijkstraResultMap().get(target.getPos());
@@ -78,7 +78,7 @@ public class BotTargetingDecisioner implements Decision<AdvancedMurderBot.GameCo
 
             // We don't want to target other bots of our type
             // TODO We probably shouldn't hardcode this name
-            if(currentHero.getName().equals("Assassin Bot"))
+            if(currentHero.getName().equals("niku"))
                 continue;
 
             // Are they on their spawn?
@@ -86,7 +86,7 @@ public class BotTargetingDecisioner implements Decision<AdvancedMurderBot.GameCo
                 continue;
 
             // Does he have more HP than we do?
-            if(currentHero.getLife() > 20 && currentHero.getLife() > me.getLife())
+            if(currentHero.getLife() > 25 && currentHero.getLife() > me.getLife())
                 continue;
 
             // Check the adjacent squares to see if a pub exists
@@ -98,6 +98,7 @@ public class BotTargetingDecisioner implements Decision<AdvancedMurderBot.GameCo
             }
 
             // Ok, we got this far...it must not be squatting.  Is it closest?
+
             if (closestTarget == null) {
                 closestTarget = currentHero;
                 closestTargetDijkstraResult = context.getDijkstraResultMap().get(closestTarget.getPos());

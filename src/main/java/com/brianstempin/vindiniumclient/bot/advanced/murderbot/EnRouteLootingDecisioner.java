@@ -6,6 +6,8 @@ import com.brianstempin.vindiniumclient.bot.advanced.AdvancedGameState;
 import com.brianstempin.vindiniumclient.bot.advanced.Mine;
 import com.brianstempin.vindiniumclient.bot.advanced.Vertex;
 import com.brianstempin.vindiniumclient.dto.GameState;
+import com.brianstempin.vindiniumclient.dto.GameState.Hero;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,9 +42,15 @@ public class EnRouteLootingDecisioner implements Decision<AdvancedMurderBot.Game
                     || mine.getOwner().getId() != context.getGameState().getMe().getId())) {
 
                 // Is it safe to take?
-                if(BotUtils.getHeroesAround(context.getGameState(), context.getDijkstraResultMap(), 1).size() > 0) {
-                    logger.info("Mine found, but another hero is too close.");
-                    return noGoodMineDecisioner.makeDecision(context);
+                if(BotUtils.getHeroesAround(context.getGameState(), context.getDijkstraResultMap(), 1).size() > 0 &&
+                		context.getGameState().getMe().getLife() < 40) {
+/*                    for (Hero h : BotUtils.getHeroesAround(context.getGameState(), context.getDijkstraResultMap(), 1)) {
+                    	if (h.getLife() > 25 && h.getId() != context.getGameState().getMe().getId()) {
+ */                       	logger.info("Mine found, but another hero is too close.");
+                            return noGoodMineDecisioner.makeDecision(context);
+/*                    	}
+                    }*/
+
                 }
                 logger.info("Taking a mine that we happen to already be walking by.");
                 return BotUtils.directionTowards(myPosition, mine.getPosition());
